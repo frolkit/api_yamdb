@@ -1,0 +1,78 @@
+name: api_yamdb
+
+on: [push]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        pip install -r requirements.txt
+        echo 'SECRET_KEY=!4k!zaekc4^salp*dv3jlv^py-qpiljice4(z&i2q0^m4j^&fa' > api_yamdb/.env
+        echo 'DEBUG=True' >> api_yamdb/.env
+    - name: Lint with flake8
+      run: flake8 --exclude venv,api_yamdb/settings.py,migrations,tests .
+    - name: tests
+      run: python manage.py test
+
+  push_to_docker_hub:
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    needs: tests
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+        
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: frolkit/api_yamdb:latest
+     
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
+
+  deploy:
+   runs-on: ubuntu-latest
+   needs: push_to_docker_hub
+   steps:
+   - name: executing remote ssh commands to deploy
+     uses: appleboy/ssh-action@master
+     with:
+       host: ${{ secrets.HOST }}
+       username: ${{ secrets.USER }}
+       key: ${{ secrets.SSH_KEY }}
+       script: |
+         sudo docker pull frolkit/api_yamdb:latest
+         sudo docker-compose -f /home/user/dev/api_yamdb/docker-compose.yaml stop
+         sudo docker-compose -f /home/user/dev/api_yamdb/docker-compose.yaml up -d
+         
+  send_message:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+    - name: send message
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_TO }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        message: ${{ github.workflow }} успешно выполнен!
