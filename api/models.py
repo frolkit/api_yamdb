@@ -10,7 +10,7 @@ class User(AbstractUser):
     )
     email = models.EmailField(unique=True)
     confirmation_code = models.IntegerField(blank=True, null=True)
-    bio = models.TextField(blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     role = models.CharField(max_length=10, choices=USER_ROLES, default="user")
     username = models.CharField(
         max_length=30, unique=True, blank=True, null=True)
@@ -40,11 +40,9 @@ class Genre(models.Model):
 class Title(models.Model):
     name = models.TextField()
     year = models.IntegerField()
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     rating = models.FloatField(blank=True, null=True)
-    description = models.TextField()
-    category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, blank=True, null=True
-    )
+    description = models.TextField(blank=True, null=True)
     genre = models.ManyToManyField(Genre)
 
 
