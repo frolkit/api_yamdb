@@ -3,13 +3,13 @@ info:
   title: 'YaMDb API'
   version: ''
   description: |
-    запросы к API начинаются с `/api/v1/`
+    запросы к API начинаются с `/`
 
     # Описание
     Проект **YaMDb** собирает отзывы пользователей на произведения. Произведения делятся на категории: «Книги», «Фильмы», «Музыка».
 
     # Алгоритм регистрации пользователей
-    1. Пользователь отправляет запрос с параметром `email` на `/auth/email/`.
+    1. Пользователь отправляет запрос с параметрами `email` и `username` на `/auth/email/`.
     2. **YaMDB** отправляет письмо с кодом подтверждения (`confirmation_code`) на адрес  `email` .
     3. Пользователь отправляет запрос с параметрами `email` и `confirmation_code` на `/auth/token/`, в ответе на запрос ему приходит `token` (JWT-токен).
     4. При желании пользователь отправляет PATCH-запрос на `/users/me/` и заполняет поля в своём профайле (описание полей — в документации).
@@ -23,7 +23,7 @@ info:
 
 
 servers:
-  - url: /api/v1/
+  - url: /
 
 tags:
   - name: REVIEWS
@@ -404,8 +404,11 @@ paths:
             schema:
               required:
                 - email
+                - username
               properties:
                 email:
+                  type: string
+                username:
                   type: string
       responses:
         200:
@@ -415,8 +418,11 @@ paths:
                 properties:
                   email:
                     type: string
+                  username:
+                    type: string
                 required:
                 - email
+                - username
           description: ''
 
   /users/:

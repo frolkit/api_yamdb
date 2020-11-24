@@ -128,7 +128,6 @@ SIMPLE_JWT = {
 }
 
 
-AUTH_USER_MODEL = "api.User"
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/

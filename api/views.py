@@ -37,10 +37,12 @@ class SignUpView(generics.CreateAPIView):
                 [f"{serializer.email}"],
                 fail_silently=False,
             )
-            return Response(serializer.data)
+        return Response(serializer.data)
 
 
 class SignInView(APIView):
+    queryset = User.objects.all()
+    serializer_class = SignInSerializer
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):

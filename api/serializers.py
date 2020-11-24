@@ -25,7 +25,7 @@ def generate_code():
 class SignUpSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("email",)
+        fields = ("email", "username")
 
     def validate(self, data):
         confirmation_code = generate_code()
@@ -48,7 +48,7 @@ class SignInSerializer(serializers.ModelSerializer):
         confirmation_code = data["confirmation_code"]
         profile = get_object_or_404(User, email=email)
         if profile.confirmation_code != confirmation_code:
-            raise ValidationError("ошибка")
+            raise ValidationError("Неправильный confirmation code")
         else:
             token = get_tokens_for_user(profile)
             data["token"] = token
