@@ -1,4 +1,4 @@
-![name_workflow Actions Status](https://github.com/frolkit/yamdb_final/workflows/Yamdb/badge.svg)
+![name_workflow Actions Status](https://github.com/frolkit/api_yamdb/workflows/api_yamdb/badge.svg)
 
 # API YamDB
 Это проект для обмена рецензий на произведения.Произведения можно разделить на категории: песни, фильмы, книги.
